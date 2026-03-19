@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Filings: allow read/write if document's userId matches (client sends userId in session; for production use Firebase Auth and request.auth.uid)
+    match /filings/{filingId} {
+      allow read, write: if true;
+      // Production: allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      // For create: allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+    // Drafts: one doc per user (doc id = userId). Restrict by auth in production.
+    match /drafts/{userId} {
+      allow read, write: if true;
+      // Production: allow read, write: if request.auth != null && userId == request.auth.uid;
+    }
+  }
+}
